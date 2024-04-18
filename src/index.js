@@ -1,24 +1,31 @@
+require('dotenv').config()
 const express = require('express');
-const cors = require('cors')
+const cors = require('cors') 
 const app = express();
-const port = 3000;
+app.use(cors()); 
+console.log(process.env.PORT);
+if(!process.env.PORT) {
+  throw new Error("Please Specify PORT Number for the HTTP Server with environment variable PORT.")
+}
+const port = process.env.PORT
+app.get('/', (req, res) => {
+  res.send('Arithmetic service - last updated 3/4/2024');
+}); 
 
-app.use(cors());
+app.get('/calculate/*', (req, res) => {
+  // Extracting expression from URL parameters
+  const expression = decodeURIComponent(req.params[0]);
 
-app.get('/',(req,res) => {
-    res.send('Hello! This is the Arithmetic Service')
-})
-
-// app.get('/summation', (req, res) => {
-//     const num1 = Number(req.query.number1);
-//     const num2 = Number(req.query.number2);
-//     const summation = num1 + num2;
-//     res.send(`${summation}`);
-// });
-app.get('/add/:n/:m', (req, res) => {
-    res.json(Number(req.params.n) + Number(req.params.m))
-})
-
-app.listen(port, () => {
-     console.log('Server is running on port 3000');
-});
+  // Evaluating the expression
+  let result;
+  try {
+      result
+      = eval
+      (expression);
+      res.json(result);
+  } catch (error) {
+      res.status(400).send('Invalid expression');
+  }
+}); 
+ 
+app.listen(port);
